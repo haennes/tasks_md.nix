@@ -89,9 +89,11 @@ in {
   };
   config = lib.mkIf cfg.enable (
   recursiveMerge ([(import ./base.nix{inherit pkgs;})] ++
-  [  #lib.lists.map(item:
-  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 0);})
-    #) cfg.conf #uncomment if map
-  ])
+  #[
+  lib.lists.map(item:
+  (import ./foreach.nix{inherit lib; item = item;})
+  ) cfg.conf #uncomment if map
+  #]
+  )
     );
 }
