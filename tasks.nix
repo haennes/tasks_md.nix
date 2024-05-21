@@ -91,6 +91,9 @@ in {
   recursiveMerge ([(import ./base.nix{inherit pkgs;})] ++
   [  #lib.lists.map(item:
   (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 0);})
+  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 1);})
+  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 2);})
+  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 3);})
     #) cfg.conf #uncomment if map
   ])
     );
