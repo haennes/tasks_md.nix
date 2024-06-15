@@ -29,4 +29,11 @@ in
         partOf = [ "docker-compose-tasksmd-root.target" ];
         wantedBy = [ "docker-compose-tasksmd-root.target" ];
       };
+    services.nginx.virtualHosts = {
+      "${item.domain}" = {
+        locations."${item.base_path}" = {
+          proxyPass = "http://localhost:${toString item.port}${item.base_path}";
+        };
+      };
+    };
     }

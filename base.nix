@@ -32,5 +32,7 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
+  services.nginx.enable = true;
+
 
 }
