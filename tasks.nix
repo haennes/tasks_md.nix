@@ -45,12 +45,11 @@ let
   };
   cfg = config.services.tasks_md;
 
-  recursiveMerge= listOfAttrsets:
-        lib.fold (attrset: acc: lib.recursiveUpdate attrset acc) { }
-        listOfAttrsets;
-    cont_name = item: builtins.replaceStrings ["/"]["_"] item.tasks_dir;
-  app = lis: map
-    (item: {
+  recursiveMerge = listOfAttrsets:
+    lib.fold (attrset: acc: lib.recursiveUpdate attrset acc) { } listOfAttrsets;
+  cont_name = item: builtins.replaceStrings [ "/" ] [ "_" ] item.tasks_dir;
+  app = lis:
+    map (item: {
       virtualisation.oci-containers.containers."tasks.md${cont_name item}" = {
         image = "baldissaramatheus/tasks.md";
         environment = {
@@ -59,11 +58,14 @@ let
           TITLE = item.title;
           BASE_PATH = item.base_path;
         };
-        volumes = [ "${item.config_dir}:/config:rw" "${item.tasks_dir}:/tasks:rw" ];
+        volumes =
+          [ "${item.config_dir}:/config:rw" "${item.tasks_dir}:/tasks:rw" ];
         ports = [ "${toString item.port}:8080/tcp" ];
         log-driver = "journald";
-        extraOptions =
-          [ "--network-alias=tasks.md${cont_name item}" "--network=tasksmd_default" ];
+        extraOptions = [
+          "--network-alias=tasks.md${cont_name item}"
+          "--network=tasksmd_default"
+        ];
       };
       systemd.services."docker-tasks.md${cont_name item}" = {
         serviceConfig = {
@@ -87,14 +89,24 @@ in {
     };
 
   };
-  config = lib.mkIf cfg.enable (
-  recursiveMerge ([(import ./base.nix{inherit pkgs;})] ++
-  [  #lib.lists.map(item:
-  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 0);})
-  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 1);})
-  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 2);})
-  (import ./foreach.nix{inherit lib; item = (lib.elemAt cfg.conf 3);})
-    #) cfg.conf #uncomment if map
-  ])
-    );
+  config = lib.mkIf cfg.enable (recursiveMerge
+    ([ (import ./base.nix { inherit pkgs; }) ] ++ [ # lib.lists.map(item:
+      (import ./foreach.nix {
+        inherit lib;
+        item = (lib.elemAt cfg.conf 0);
+      })
+      (import ./foreach.nix {
+        inherit lib;
+        item = (lib.elemAt cfg.conf 1);
+      })
+      (import ./foreach.nix {
+        inherit lib;
+        item = (lib.elemAt cfg.conf 2);
+      })
+      (import ./foreach.nix {
+        inherit lib;
+        item = (lib.elemAt cfg.conf 3);
+      })
+      #) cfg.conf #uncomment if map
+    ]));
 }
