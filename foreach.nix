@@ -4,7 +4,7 @@ let
 in
 {
       virtualisation.oci-containers.containers."tasks.md${cont_name item}" = {
-        image = "baldissaramatheus/tasks.md";
+        image = "baldissaramatheus/tasks.md:2.5.3";
         environment = {
           PGID = toString item.guid;
           PUID = toString item.puid;
