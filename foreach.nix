@@ -1,4 +1,4 @@
-{ lib, item }:
+{ lib, item, cfg }:
 let cont_name = item: builtins.replaceStrings [ "/" ] [ "_" ] item.tasks_dir;
 in {
   virtualisation.oci-containers.containers."tasks.md${cont_name item}" = {
@@ -29,7 +29,7 @@ in {
     partOf = [ "docker-compose-tasksmd-root.target" ];
     wantedBy = [ "docker-compose-tasksmd-root.target" ];
   };
-  services.nginx.virtualHosts = {
+  services.nginx.virtualHosts = lib.mkIf cfg.enableNginx {
     "${item.domain}" = {
       locations."${item.base_path}" = {
         proxyPass = "http://localhost:${toString item.port}${item.base_path}";

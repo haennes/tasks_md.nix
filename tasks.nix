@@ -15,6 +15,9 @@ let
         type = types.path;
         example = "/tasks";
         default = "/";
+        description = ''
+          basepath of the url
+        '';
       };
 
       title = mkOption rec {
@@ -49,6 +52,8 @@ let
 in {
   options.services.tasks_md = {
     enable = with lib; mkEnableOption "tasks";
+    enableNginx = with lib;
+      mkEnableOption "enable Nginx virtual Hosts configured using domain";
     conf = lib.mkOption {
       type = lib.types.either (lib.types.listOf sub) sub;
       apply = with lib; old: if isList old then old else [ old ];
@@ -58,19 +63,19 @@ in {
   config = lib.mkIf cfg.enable (recursiveMerge
     ([ (import ./base.nix { inherit pkgs; }) ] ++ [ # lib.lists.map(item:
       (import ./foreach.nix {
-        inherit lib;
+        inherit lib cfg;
         item = (lib.elemAt cfg.conf 0);
       })
       (import ./foreach.nix {
-        inherit lib;
+        inherit lib cfg;
         item = (lib.elemAt cfg.conf 1);
       })
       (import ./foreach.nix {
-        inherit lib;
+        inherit lib cfg;
         item = (lib.elemAt cfg.conf 2);
       })
       (import ./foreach.nix {
-        inherit lib;
+        inherit lib cfg;
         item = (lib.elemAt cfg.conf 3);
       })
       #) cfg.conf #uncomment if map
