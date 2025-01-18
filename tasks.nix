@@ -55,7 +55,8 @@ in {
     enableNginx = with lib;
       mkEnableOption "enable Nginx virtual Hosts configured using domain";
     conf = lib.mkOption {
-      type = lib.types.either (lib.types.listOf sub) sub;
+      type = lib.types.nullOr (lib.types.either (lib.types.listOf sub) sub);
+      default = null;
       apply = with lib; old: if isList old then old else [ old ];
     };
 
